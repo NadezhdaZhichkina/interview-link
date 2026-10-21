@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Агент интервью — тестовая версия</title>
+<style>
+  :root { --bg: #f3f5f7; --fg: #18202b; --muted: #5d6877; --accent: #2f5fd0; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #11151b; --fg: #e5e9ef; --muted: #98a3b2; --accent: #7ea2ff; } }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); color: var(--fg); font: 17px/1.5 -apple-system, system-ui, sans-serif; padding: 16px; box-sizing: border-box; }
+  main { max-width: 460px; display: grid; gap: 10px; }
+  h1 { font-size: 22px; margin: 0; } p { margin: 0; } .muted { color: var(--muted); font-size: 15px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Агент интервью</h1>
+  <p id="msg">Ищу, где сейчас работает агент…</p>
+  <p class="muted">Тестовая версия для знакомства. Код доступа спросите у Надежды Жичкиной.</p>
+</main>
+<script>
+// Адрес агента меняется (временный туннель с Mac). Текущий хранится в url.txt этого репозитория —
+// берём его через API GitHub, он не кэширует надолго, в отличие от самой страницы.
+(async () => {
+  const msg = document.getElementById('msg');
+  try {
+    const r = await fetch('https://api.github.com/repos/NadezhdaZhichkina/interview-link/contents/url.txt',
+      { headers: { Accept: 'application/vnd.github.raw' }, cache: 'no-store' });
+    const url = (await r.text()).trim();
+    if (!/^https:\/\/[a-z0-9.-]+$/.test(url)) throw new Error();
+    msg.innerHTML = 'Перехожу к агенту… Если не перешло — <a href="' + url + '">нажмите сюда</a>.';
+    location.replace(url);
+  } catch {
+    msg.textContent = 'Агент сейчас выключен (компьютер Надежды не в сети). Попробуйте позже.';
+  }
+})();
+</script>
+</body>
+</html>
